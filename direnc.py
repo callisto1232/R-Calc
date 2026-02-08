@@ -1,4 +1,4 @@
-#by FOX
+#by FOX & callisto1232
 # Direnç Hesaplayıcı Uygulaması
 # Bu uygulama, direnç bant renklerini kullanarak direnç değerlerini hesaplar.
 
@@ -9,6 +9,9 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QSettings
 from PyQt5.QtGui import QPixmap, QPainter, QIcon, QColor
 import sys
+import os
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 color_values = {
     "Siyah": (0, 1, None),
@@ -88,21 +91,12 @@ class ResistorCalculator(QWidget):
         self.apply_system_theme()
 
     def apply_system_theme(self):
-        import platform
         from PyQt5.QtGui import QPalette
-
-        is_dark = False
-
-        if platform.system() == "Darwin":
-            try:
-                import subprocess
-                result = subprocess.run(
-                    ["defaults", "read", "-g", "AppleInterfaceStyle"],
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-                )
-                is_dark = "Dark" in result.stdout
-            except Exception:
-                is_dark = False
+        try:
+            import darkdetect
+            is_dark = darkdetect.isDark()
+        except: 
+            is_dark = False
 
         palette = QPalette()
         if is_dark:
@@ -127,12 +121,16 @@ class ResistorCalculator(QWidget):
         band_count = int(self.band_count_selector.currentText())
 
         image_paths = {
-            4: "/Users/fox/Documents/Ext/Dırenc/4bant.png",
-            5: "/Users/fox/Documents/Ext/Dırenc/5bant.png",
-            6: "/Users/fox/Documents/Ext/Dırenc/6bant.png"
+            4: os.path.join(base_dir, "4bant.png"),
+            5: os.path.join(base_dir, "5bant.png"),
+            6: os.path.join(base_dir, "6bant.png")
         }
-        pixmap = QPixmap(image_paths[band_count]).scaled(500, 120, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.direnc_resmi.setPixmap(pixmap)
+        image_path = image_paths[band_count]
+        if os.path.exists(image_path):
+            pixmap = QPixmap(image_path).scaled(500, 120, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.direnc_resmi.setPixmap(pixmap)
+        else:
+            self.direnc_resmi.setText(f"Resim bulunamadı\n{image_path}\n\n4/5/6bant.png")
 
         for band in getattr(self, 'bantlar', []):
             band.deleteLater()

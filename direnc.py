@@ -1,4 +1,7 @@
-#by FOX & callisto1232
+
+#by FOX
+#by Callisto1232
+
 # Direnç Hesaplayıcı Uygulaması
 # Bu uygulama, direnç bant renklerini kullanarak direnç değerlerini hesaplar.
 
